@@ -1,0 +1,14 @@
+# next.js build output
+my-app/.next
+
+# dotenv environment variables file (build for Zeit Now)
+my-app/.env
+my-app/.env.build
+
+# Dependency directories
+my-app/node_modules/
+
+# Logs
+my-app/npm-debug.log*
+my-app/yarn-debug.log*
+my-app/yarn-error.log*
