@@ -1,22 +1,33 @@
+import type { NextPage, GetServerSideProps } from 'next'
 import { Container } from '@chakra-ui/layout'
-import { Heading } from "@chakra-ui/react"
-import type { NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
-import Header from '../components/header'
-import Task from '../components/task'
+import { Heading } from '@chakra-ui/react'
+import getTasks from '../lib/getTasks'
+import Rows from '../interfaces/rows'
+import Header from '../components/Header'
+import Tasks from '../components/Tasks'
+import AddTask from '../components/AddTask'
 
-const Home: NextPage = () => {
+type HomeProps = {
+  rows: Rows,
+}
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const rows: Rows = await getTasks();
+  return {
+    props: {
+      rows,
+    },
+  }
+}
+
+const Home: NextPage<HomeProps> = ({ rows }) => {
   return (
     <>
-      <Head>
-        <title>Todolist</title>
-      </Head>
       <Header />
-      <Container maxW={'container.md'}>
-        <Heading as={"h1"} mt={10} size={"2xl"}>Tasks</Heading>
-        <Task text={"test"}></Task>
-        <Task text={"test1"}></Task>
+      <Container maxW="container.md">
+        <Heading as="h1" mt={10} size="2xl">Tasks</Heading>
+        <Tasks rows={rows} />
+        <AddTask />
       </Container>
     </>
   )

@@ -2,16 +2,17 @@ version: '3.9'
 services:
   db:
     image: mysql:5.7
+    volumes: 
+    - ./db/initdb.d:/docker-entrypoint-initdb.d
+    ports:
+    - "13306:3306"
     environment: 
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: todolist_database
       MYSQL_USER: user
       MYSQL_PASSWORD: password
       TZ: 'Asia/Tokyo'
-    volumes: 
-    - ./db/initdb.d:/docker-entrypoint-initdb.d
-    ports:
-    - "8080:8080"
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     restart: always
       
   app:
@@ -20,9 +21,9 @@ services:
     - ./my-app:/app
     ports:
     - "3000:3000"
-    restart: always
     working_dir: /app
     command: npm run dev
     environment: 
     - CHOKIDAR_USEPOLLING=true
+    restart: always
 
