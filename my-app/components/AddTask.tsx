@@ -37,6 +37,10 @@ type postTaskProps =
         minutes: string,
     ) => void;
 
+type AddTaskProps = {
+    onSubmit:() => Promise<void>
+}
+
 const postTask: postTaskProps = async (name, description, year, month, day, hours, minutes) => {
     const isNum = (str: string) => Number.isInteger(parseInt(str));
     let date = null;
@@ -62,7 +66,7 @@ const postTask: postTaskProps = async (name, description, year, month, day, hour
     })
 };
 
-const AddTask: NextPage = () => {
+const AddTask: NextPage<AddTaskProps> = (props) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const {
         handleSubmit,
@@ -70,8 +74,9 @@ const AddTask: NextPage = () => {
         formState: { errors, isSubmitting }
     } = useForm();
 
-    const onSubmit = (values: any) => {
-        return postTask(values["name"], values["description"], values["year"], values["month"], values["day"], values["hours"], values["minutes"]);
+    const onSubmit = async (values: any) => {
+        await postTask(values["name"], values["description"], values["year"], values["month"], values["day"], values["hours"], values["minutes"]);
+        await props.onSubmit();
     }
 
     return (
