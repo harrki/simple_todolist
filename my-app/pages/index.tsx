@@ -35,7 +35,7 @@ const Home: NextPage<HomeProps> = ({ firstRows }) => {
       <Header />
       <Container maxW="container.md">
         <Heading as="h1" mt={10} size="2xl">Tasks</Heading>
-        <Tasks rows={rows} />
+        <Tasks rows={rows} updateTasks={updateTasks}/>
         <AddTask onSubmit={updateTasks} />
       </Container>
     </>

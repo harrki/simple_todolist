@@ -1,4 +1,5 @@
 import { NextApiHandler } from "next";
+import deleteTask from "../../../lib/deleteTask";
 import editTask from "../../../lib/editTask";
 import getTaskInfo from "../../../lib/getTaskInfo";
 
@@ -11,17 +12,26 @@ const taskId: NextApiHandler = async (req, res) => {
                 res.status(200).json(result);
             } catch (err) {
                 console.error(err);
-                res.status(400).json({ status: "failed" })
+                res.status(400).json({ status: "failed" });
             }
         }
         if (req.method === "POST") {
             const data = req.body;
             try {
                 await editTask(pid, data.isFinished, data.name, data.description, data.deadline);
-                res.status(200).json({ status: "success" })
+                res.status(200).json({ status: "success" });
             } catch (err) {
                 console.error(err);
-                res.status(400).json({ status: "failed" })
+                res.status(400).json({ status: "failed" });
+            }
+        }
+        if(req.method === "DELETE"){
+            try {
+                await deleteTask(pid);
+                res.status(200).json({ status: "success" });
+            } catch (err) {
+                console.error(err);
+                res.status(400).json({ status: "failed" });
             }
         }
     } else {
