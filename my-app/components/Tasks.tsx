@@ -7,15 +7,18 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import Rows from '../interfaces/rows'
 
 type TaskProps = {
+    id: string,
     isFinished: boolean,
     name: string,
     description: string | null,
     deadline: string | null,
     deadline_color: string | null,
+    updateTasks:()=>Promise<void>,
 }
 
 type TasksProps = {
     rows: Rows,
+    updateTasks:()=>Promise<void>,
 }
 
 const calcRemainingDate = (deadline: (string | null)) => {
@@ -36,6 +39,13 @@ const calcRemainingDate = (deadline: (string | null)) => {
 }
 
 const Task: NextPage<TaskProps> = (props) => {
+    const deleteTask = async (id:string)=>{
+        await fetch("/api/task/"+id,{
+            "method":"DELETE",
+        })
+        await props.updateTasks();
+    }
+
     return (
         <Box boxShadow="base" rounded="md" px={3} py={2} mt={3}>
             <Flex alignItems="center" width="100%">
@@ -78,7 +88,7 @@ const Task: NextPage<TaskProps> = (props) => {
                     />
                     <MenuList>
                         <MenuItem>Edit</MenuItem>
-                        <MenuItem color="red">Delete</MenuItem>
+                        <MenuItem color="red" onClick={async()=>{await deleteTask(props.id)}}>Delete</MenuItem>
                     </MenuList>
                 </Menu>
             </Flex>
@@ -94,12 +104,14 @@ const Tasks: NextPage<TasksProps> = (props) => {
                 const { str, color } = calcRemainingDate(x['deadline']);
                 return (
                     <Task
+                        id={x['id']}
                         isFinished={x['isFinished']}
                         name={x['name']}
                         description={x['description']}
                         deadline={str}
                         deadline_color={color}
                         key={x['id']}
+                        updateTasks={props.updateTasks}
                     ></Task>
                 );
             })}
