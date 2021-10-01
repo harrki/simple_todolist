@@ -13,12 +13,12 @@ type TaskProps = {
     description: string | null,
     deadline: string | null,
     deadline_color: string | null,
-    updateTasks:()=>Promise<void>,
+    updateTasks: () => Promise<void>,
 }
 
 type TasksProps = {
     rows: Rows,
-    updateTasks:()=>Promise<void>,
+    updateTasks: () => Promise<void>,
 }
 
 const calcRemainingDate = (deadline: (string | null)) => {
@@ -38,10 +38,80 @@ const calcRemainingDate = (deadline: (string | null)) => {
     return { "str": str, "color": color }
 }
 
+const Name = (isFinished: boolean, name: string) => {
+    if (isFinished) {
+        return (
+            <Text
+                as="del"
+                color="gray"
+                fontSize="2xl"
+                fontWeight="600"
+                overflow="hidden"
+                textOverflow="ellipsis"
+                whiteSpace="nowrap"
+            >
+                {name}
+            </Text>
+        );
+    } else {
+        return (
+            <Text
+                fontSize="2xl"
+                fontWeight="600"
+                overflow="hidden"
+                textOverflow="ellipsis"
+                whiteSpace="nowrap"
+            >
+                {name}
+            </Text>
+        );
+    }
+}
+
+const Description = (description: (string | null)) => {
+    if (typeof description === "string") {
+        return (
+            <Text
+                color="gray"
+                overflow="hidden"
+                textOverflow="ellipsis"
+                whiteSpace="nowrap"
+            >
+                {description}
+            </Text>
+        );
+    }
+
+    return (<></>);
+}
+
+const Deadline = (deadline: (string | null), color: (string | null)) => {
+    if (typeof deadline === "string" && typeof color === "string") {
+        return (
+            <Text color={color} fontWeight="semibold">{deadline}</Text>
+        );
+    }
+
+    return (<></>);
+}
+
 const Task: NextPage<TaskProps> = (props) => {
-    const deleteTask = async (id:string)=>{
-        await fetch("/api/task/"+id,{
-            "method":"DELETE",
+    const deleteTask = async (id: string) => {
+        await fetch("/api/task/" + id, {
+            "method": "DELETE",
+        })
+        await props.updateTasks();
+    }
+
+    const checkTask = async (id: string, isFinished: boolean) => {
+        const data = { "isFinished": isFinished, name: null, "description": null, "deadline": null };
+        console.log(data);
+        await fetch("/api/task/" + id, {
+            "method": "POST",
+            body: JSON.stringify(data),
+            headers: {
+                "Content-Type": "application/json",
+            }
         })
         await props.updateTasks();
     }
@@ -49,34 +119,17 @@ const Task: NextPage<TaskProps> = (props) => {
     return (
         <Box boxShadow="base" rounded="md" px={3} py={2} mt={3}>
             <Flex alignItems="center" width="100%">
-                <Checkbox size="lg" colorScheme="green" mr={3} defaultChecked={props.isFinished}></Checkbox>
+                <Checkbox
+                    size="lg"
+                    colorScheme="green"
+                    mr={3}
+                    defaultChecked={props.isFinished}
+                    onChange={async () => { await checkTask(props.id, !props.isFinished) }}>
+                </Checkbox>
                 <Box minW={0}>
-                    <Text
-                        fontSize="2xl"
-                        fontWeight="600"
-                        overflow="hidden"
-                        textOverflow="ellipsis"
-                        whiteSpace="nowrap"
-                    >
-                        {props.name}
-                    </Text>
-                    {
-                        (typeof props.description === "string") ?
-                            <Text
-                                color="gray"
-                                overflow="hidden"
-                                textOverflow="ellipsis"
-                                whiteSpace="nowrap"
-                            >
-                                {props.description}
-                            </Text>
-                            : <></>
-                    }
-                    {
-                        (typeof props.deadline === "string" && typeof props.deadline_color === "string") ?
-                            <Text color={props.deadline_color} fontWeight="semibold">{props.deadline}</Text>
-                            : <></>
-                    }
+                    {Name(props.isFinished, props.name)}
+                    {Description(props.description)}
+                    {Deadline(props.deadline, props.deadline_color)}
                 </Box>
                 <Spacer />
                 <Menu>
@@ -88,7 +141,7 @@ const Task: NextPage<TaskProps> = (props) => {
                     />
                     <MenuList>
                         <MenuItem>Edit</MenuItem>
-                        <MenuItem color="red" onClick={async()=>{await deleteTask(props.id)}}>Delete</MenuItem>
+                        <MenuItem color="red" onClick={async () => { await deleteTask(props.id) }}>Delete</MenuItem>
                     </MenuList>
                 </Menu>
             </Flex>
