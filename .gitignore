@@ -12,3 +12,6 @@ my-app/node_modules/
 my-app/npm-debug.log*
 my-app/yarn-debug.log*
 my-app/yarn-error.log*
+
+.DS_Store
+*/.DS_Store
