@@ -16,7 +16,7 @@ services:
     restart: always
       
   app:
-    image: node:14
+    image: node:20
     volumes: 
     - ./my-app:/app
     ports:
